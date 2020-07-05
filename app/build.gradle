@@ -1,0 +1,96 @@
+apply plugin: 'com.android.application'
+
+android {
+
+    signingConfigs {
+        qxzn_keystore {
+            storeFile file('../keystore/qxzn.jks')
+            storePassword 'startai'
+            keyPassword 'startai'
+            keyAlias = 'qxzn'
+        }
+
+    }
+
+    compileSdkVersion 28
+    buildToolsVersion "29.0.2"
+    defaultConfig {
+        applicationId "cn.com.startai.multichanneldemo"
+        minSdkVersion 19
+        targetSdkVersion 28
+        versionName APP_VERNAME
+        versionCode Integer.parseInt(APP_VERCODE)
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        signingConfig signingConfigs.qxzn_keystore
+    }
+
+
+    flavorDimensions "evn","app"
+    productFlavors{
+        //app2产品,注意(这边的产品名字字母不能大写)
+        wsgw{
+            dimension "app"
+            applicationId "cn.com.startai.multichanneldemo.wsgw"
+            resValue "string", "app_desktop_name", "国网提醒终端"
+            manifestPlaceholders = [channel:"wsgw",app_icon: "@mipmap/logo_4_wsgw"]
+        }
+        //app1产品,注意(这边的产品名字字母不能大写)
+        znrt{
+            dimension "app"
+            applicationId "cn.com.startai.multichanneldemo.znrt"
+            resValue "string", "app_desktop_name", "智慧中能"
+            manifestPlaceholders = [channel:"znrt",app_icon: "@mipmap/logo_4_znrt"]
+        }
+        qxzn{
+            dimension "app"
+            applicationId "cn.com.startai.multichanneldemo"
+            resValue "string", "app_desktop_name", "亓行智能"
+            manifestPlaceholders = [channel:"qxzn",app_icon: "@mipmap/logo_4_qxzn"]
+        }
+        //测试环境
+        evn_test{
+            dimension "evn"
+
+        }
+        //生产环境
+        evn_product{
+            dimension "evn"
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.qxzn_keystore
+        }
+        debug {
+            signingConfig signingConfigs.qxzn_keystore
+        }
+    }
+    compileOptions {
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
+    }
+
+    android.applicationVariants.all {
+        variant ->
+            variant.outputs.all {
+                //在这里修改apk文件名
+                outputFileName = "MultiChannelDemo-${variant.productFlavors[0].name}-v${variant.versionName}-" + buildType.name + ".apk"
+//                outputFileName = "MultiChannelDemo-v${variant.versionName}-" + buildType.name + ".apk"
+            }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test:runner:1.2.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
+    api 'cn.com.startai:common:1.1.44'
+
+}
